@@ -1,24 +1,30 @@
+name: iOS-ipa-build
+
+on:
+  workflow_dispatch:
+
 jobs:
   build-ios:
+    name: 🎉 iOS Build
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
 
-      - name: Clean build and fetch dependencies
-        run: |
-          flutter clean
-          flutter pub get
+      - name: Clean Flutter build
+        run: flutter clean
+
+      - run: flutter pub get
 
       - name: Update CocoaPods
         run: pod repo update
         working-directory: ios
 
-      - name: Build iOS app
-        run: flutter build ios --release --no-codesign
+      - run: flutter build ios --release --no-codesign
 
       - name: Prepare IPA Payload
         run: |
@@ -30,7 +36,8 @@ jobs:
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
 
-      - uses: svenstaro/upload-release-action@v2
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/ios/iphoneos/FlutterIpaExport.ipa
