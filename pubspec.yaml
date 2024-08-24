@@ -1,10 +1,12 @@
 name: madidou
 description: "A new Flutter project."
+
 # Prevents the package from being accidentally published to pub.dev.
 # Remove this line if you wish to publish to pub.dev.
 publish_to: "none"
 
-# Version and build number configuration. Can be overridden during the build process.
+# Version and build number configuration.
+# Can be overridden during the build process.
 version: 1.0.0+1
 
 environment:
@@ -49,6 +51,11 @@ dependencies:
   socket_io_client: ^2.0.3+1
   flutter_spinkit: ^5.2.1
   flutter_localization: ^0.2.0
+  # Adding win32 with platform-specific conditions
+  win32:
+    version: "^5.4.0"
+    platforms:
+      windows:
 
 dev_dependencies:
   flutter_test:
@@ -61,7 +68,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/avaters/
+    - assets/avatars/
     - assets/Backgrounds/
     - assets/icons/
     - assets/RiveAssets/
