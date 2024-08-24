@@ -8,31 +8,43 @@ jobs:
     name: 🎉 iOS Build
     runs-on: macos-latest
     steps:
+      # Check out the repository code
       - uses: actions/checkout@v3
 
+      # Set up Flutter environment
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
 
+      # Get Flutter dependencies
       - run: flutter pub get
 
+      # Update iOS dependencies using CocoaPods
       - name: Update CocoaPods
         run: pod repo update
         working-directory: ios
 
-      - run: flutter build ios --release --no-codesign
+      # Build the iOS app without code signing
+      # Ensure no Windows-specific dependencies like 'win32' interfere
+      - name: Build iOS app
+        run: flutter build ios --release --no-codesign
+        env:
+          FLUTTER_TARGET_PLATFORM: ios
 
+      # Create a Payload directory and move the Runner.app
       - name: Prepare IPA Payload
         run: |
           mkdir -p Payload
           mv build/ios/iphoneos/Runner.app Payload/
         working-directory: build/ios/iphoneos
 
+      # Zip the Payload to create an IPA file
       - name: Zip output
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
 
+      # Upload the IPA file to GitHub Releases
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -41,4 +53,3 @@ jobs:
           tag: v1.0
           overwrite: true
           body: "This is the first release"
-
