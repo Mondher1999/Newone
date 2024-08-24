@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "786026880489",
+    "project_id": "madidou-8f3cf",
+    "storage_bucket": "madidou-8f3cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786026880489:android:4917d71bef761bdd2a3f78",
+        "android_client_info": {
+          "package_name": "com.madidou.madidou"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByKI0TuIloapYLr0YThAiZhas8lWbjJKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
