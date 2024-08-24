@@ -8,43 +8,48 @@ jobs:
     name: 🎉 iOS Build
     runs-on: macos-latest
     steps:
-      # Check out the repository code
+      # Step 1: Check out the repository code
       - uses: actions/checkout@v3
 
-      # Set up Flutter environment
+      # Step 2: Set up Flutter environment
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
 
-      # Get Flutter dependencies
+      # Step 3: Get Flutter dependencies
       - run: flutter pub get
 
-      # Update iOS dependencies using CocoaPods
+      # Step 4: Ensure no platform-incompatible code is included in the build
+      - name: Check Platform Compatibility
+        run: |
+          if grep -R "import 'package:win32/win32.dart';" lib/; then
+            echo "Error: Win32 package is not compatible with iOS."
+            exit 1
+          fi
+
+      # Step 5: Update iOS dependencies using CocoaPods
       - name: Update CocoaPods
         run: pod repo update
         working-directory: ios
 
-      # Build the iOS app without code signing
-      # Ensure no Windows-specific dependencies like 'win32' interfere
+      # Step 6: Build the iOS app without code signing
       - name: Build iOS app
         run: flutter build ios --release --no-codesign
-        env:
-          FLUTTER_TARGET_PLATFORM: ios
 
-      # Create a Payload directory and move the Runner.app
+      # Step 7: Create a Payload directory and move the Runner.app
       - name: Prepare IPA Payload
         run: |
           mkdir -p Payload
           mv build/ios/iphoneos/Runner.app Payload/
         working-directory: build/ios/iphoneos
 
-      # Zip the Payload to create an IPA file
+      # Step 8: Zip the Payload to create an IPA file
       - name: Zip output
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
 
-      # Upload the IPA file to GitHub Releases
+      # Step 9: Upload the IPA file to GitHub Releases
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
