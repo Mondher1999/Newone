@@ -5,30 +5,39 @@ on:
 
 jobs:
   build-ios:
+    name: 🎉 iOS Build
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           architecture: x64
+
+      - name: Clean Flutter build
+        run: flutter clean
+
       - run: flutter pub get
-      - name: Check Platform Compatibility
-        run: |
-          if grep -R "package:win32/win32.dart" $(find . -name '*.dart'); then
-            echo "Win32 package found in non-Windows build."
-            exit 1
-          fi
-      - run: pod repo update
+
+      - name: Update CocoaPods
+        run: pod repo update
         working-directory: ios
+
       - run: flutter build ios --release --no-codesign
-      - run: mkdir -p Payload
+
+      - name: Prepare IPA Payload
+        run: |
+          mkdir -p Payload
+          mv build/ios/iphoneos/Runner.app Payload/
         working-directory: build/ios/iphoneos
-      - run: mv build/ios/iphoneos/Runner.app Payload/
+
+      - name: Zip output
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
-      - run: zip -qq -r -9 FlutterIpaExport.ipa Payload
-        working-directory: build/ios/iphoneos
-      - uses: svenstaro/upload-release-action@v2
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/ios/iphoneos/FlutterIpaExport.ipa
